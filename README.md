@@ -1,6 +1,6 @@
 # weekly_calendar
 
-A new Flutter project.
+Adding a meeting by choosing the hours of a working week and listing the selected ones.
 
 ## Getting Started
 
