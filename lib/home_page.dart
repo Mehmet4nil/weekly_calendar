@@ -238,6 +238,7 @@ class _HomePageState extends State<HomePage> {
         itemCount: appointments.length,
         itemBuilder: (context, index) {
           return ListTile(
+            // _Tarihlerin formatlanması ve kutunun saat aralığının yazdırılması.
             title: Text((index + 1).toString() +
                 ". " +
                 formatter.format(appointments[index].startTime).toString() +
