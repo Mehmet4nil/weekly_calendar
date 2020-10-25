@@ -86,11 +86,9 @@ class _HomePageState extends State<HomePage> {
 
   List<TimeRegion> _getTimeRegions() {
     final List<TimeRegion> regions = <TimeRegion>[];
-    var _startOfDay = DateTime(
-        _time.year,
-        _time.month,
-        _time
-            .day); // _"2020-10-19 00:00:00.000" tarzında bir time elde etmek için
+
+    // _"2020-10-19 00:00:00.000" tarzında bir time elde etmek için
+    var _startOfDay = DateTime(_time.year, _time.month, _time.day);
     regions.add(TimeRegion(
       startTime: _startOfDay,
       endTime: _startOfDay.add(Duration(hours: 24)),
@@ -102,60 +100,31 @@ class _HomePageState extends State<HomePage> {
     return regions;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    //_controller = CalendarController();
-  }
-
-  alertDialog(BuildContext context) {
-    // This is the ok button
-    Widget ok = FlatButton(
-      child: Text("Okay"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-    // show the alert dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("I am Here!"),
-          content: Text("I appeared because you pressed the button!"),
-          actions: [
-            ok,
-          ],
-          elevation: 5,
-        );
-      },
-    );
-  }
-
+  // _Seçilen kutuların tüm özellikleri ile tutulduğu liste.
   List<Appointment> appointments = <Appointment>[];
 
   _AppointmentDataSource _getCalendarDataSource() {
-    var _startOfDay = DateTime(_time.year, _time.month, _time.day + 4);
-
     return _AppointmentDataSource(appointments);
   }
 
   void _setAppointments(CalendarTapDetails calendarTapDetails) {
     if (calendarTapDetails.appointments == null) {
+      // _Boş kutuya tıklandığında eklenecek toplantının verilerini tutar.
       _ap1 = Appointment(
         startTime: calendarTapDetails.date,
         endTime: calendarTapDetails.date.add(Duration(minutes: 60)),
         subject: 'Meeting',
-        color: Colors.blue,
+        color: Colors.cyanAccent[600],
         startTimeZone: '',
         endTimeZone: '',
       );
     } else {
+      // _Silinecek veri seçildiğinde dönen veri, ikinci seçmede özellik farklı döndüğü için bu çözüm kullanıldı.
       _ap1 = Appointment(
         startTime: calendarTapDetails.appointments[0].startTime,
         endTime: calendarTapDetails.appointments[0].startTime
             .add(Duration(minutes: 60)),
-        subject: 'Meeting',
+        subject: '',
         color: Colors.blue,
         startTimeZone: '',
         endTimeZone: '',
@@ -163,6 +132,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
+      // _Seçilen kutunun daha önce seçilip seçilmediği kontrol edilir yoksa eklenir, var ise silinir.
       var _meetingControl = appointments.singleWhere(
           (element) => element.startTime == _ap1.startTime,
           orElse: () => null);
@@ -175,6 +145,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   SfCalendar _getShiftScheduler(dynamic calendarTapCallback) {
+    // _Takvimin tüm özellikleri ve oluşturulması.
     return SfCalendar(
       view: CalendarView.week,
       firstDayOfWeek: getVerboseDateTimeRepresentation(
@@ -220,16 +191,15 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // TableCalendar(calendarController: _controller),
             Container(
-              height: 820.0, // _Takvim yüksekliği
+              // _Takvim yüksekliği
+              height: 820.0,
+              // _Varsa seçilen kutuların takime yollanması ve takvimin ekrana çizilmesi.
               child: _getShiftScheduler(_setAppointments),
             ),
             Center(
                 child: RaisedButton(
               onPressed: () {
-                //alertDialog(context);
-                //_setAppointments();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -249,8 +219,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 padding: const EdgeInsets.all(10.0),
-                child: const Text('Seçilenleri Listele',
-                    style: TextStyle(fontSize: 20)),
+                child:
+                    const Text('List Selected', style: TextStyle(fontSize: 20)),
               ),
             )),
           ],
@@ -260,7 +230,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _myListView(BuildContext context) {
-    final DateFormat formatter = DateFormat('dd MMM y  EEEE');
+    // _Seçilen kutular liste halinde formatlanarak Widget haline dönüştürülür ve ikinci ekrana yollanır.
+    final DateFormat formatter = DateFormat('dd MMM y EEEE');
     if (appointments.length != 0) {
       return ListView.builder(
         itemExtent: 29.0,
@@ -269,11 +240,16 @@ class _HomePageState extends State<HomePage> {
           return ListTile(
             title: Text((index + 1).toString() +
                 ". " +
-                formatter.format(appointments[index].startTime).toString()),
+                formatter.format(appointments[index].startTime).toString() +
+                " -> " +
+                appointments[index].startTime.toString().substring(11, 16) +
+                " / " +
+                appointments[index].endTime.toString().substring(11, 16)),
           );
         },
       );
     } else {
+      // _Hiç öğre seçilmemiş ise uyarı yazısı yazdırılır.
       return Text("The selection list is empty. Please choose a meeting date.",
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,

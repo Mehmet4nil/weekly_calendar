@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class SecondRoute extends StatelessWidget {
+  // _Seçilen veriler ana ekranda liste haline getirilir ve Widget halinde liste olarak gösterilmek üzere bu ekrana yollanır.
   Widget _myListView;
   SecondRoute(this._myListView);
 
