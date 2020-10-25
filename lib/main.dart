@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Weekly Calendar"),
+        title: Center(child: Text("Weekly Calendar")),
         actions: <Widget>[
           IconButton(
             icon: Icon(
