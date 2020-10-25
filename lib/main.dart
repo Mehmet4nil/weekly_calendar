@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:table_calendar/table_calendar.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
+import 'C:\Users\Mehmet\Desktop\Flutter\weekly_calendar\lib\list_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -289,50 +290,5 @@ class _HomePageState extends State<HomePage> {
 class _AppointmentDataSource extends CalendarDataSource {
   _AppointmentDataSource(List<Appointment> source) {
     appointments = source;
-  }
-}
-
-class SecondRoute extends StatelessWidget {
-  Widget _myListView;
-  SecondRoute(this._myListView);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("List Of Selected Items"),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 595.0,
-              child: _myListView,
-            ),
-            Center(
-                child: RaisedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              textColor: Colors.white,
-              padding: const EdgeInsets.all(0.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: <Color>[
-                      Color(0xFF0D47A1),
-                      Color(0xFF1976D2),
-                      Color(0xFF42A5F5),
-                    ],
-                  ),
-                ),
-                padding: const EdgeInsets.all(10.0),
-                child: const Text('Go Back', style: TextStyle(fontSize: 20)),
-              ),
-            )),
-          ],
-        ),
-      ),
-    );
   }
 }
