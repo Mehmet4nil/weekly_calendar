@@ -148,8 +148,8 @@ class _HomePageState extends State<HomePage> {
     // _Takvimin tüm özellikleri ve oluşturulması.
     return SfCalendar(
       view: CalendarView.week,
-      firstDayOfWeek: getVerboseDateTimeRepresentation(
-          _time), // _Hangi günde isek tablo başlangıcına o günün getirilmesi
+      // _Hangi günde isek tablo başlangıcına o günün getirilmesi
+      firstDayOfWeek: getVerboseDateTimeRepresentation(_time),
       // initialSelectedDate: DateTime(2020, 10, 18, 10), // _Açılışta gün seçili olması
       dataSource: _getCalendarDataSource(),
       timeSlotViewSettings: TimeSlotViewSettings(
