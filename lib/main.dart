@@ -251,7 +251,8 @@ class _HomePageState extends State<HomePage> {
       );
     } else {
       // _Hiç öğre seçilmemiş ise uyarı yazısı yazdırılır.
-      return Text("The selection list is empty. Please choose a meeting date.",
+      return Text(
+          "The selection list is empty. Please choose a meeting date !!!",
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
