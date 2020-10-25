@@ -27,14 +27,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //CalendarController _controller;
-  bool _chcBxValue = false;
-  String deneme = "deneme";
   DateTime _time = DateTime.now(); //Güncel zaman veririsin alınması.
+  Appointment _ap1 = Appointment(
+    startTime: DateTime.now(),
+    endTime: DateTime.now().add(Duration(minutes: 60)),
+    subject: 'Meeting',
+    color: Colors.blue,
+    startTimeZone: '',
+    endTimeZone: '',
+  );
 
   int getVerboseDateTimeRepresentation(DateTime dateTime) {
-    String _date = DateFormat('EEEE').format(
-        _time); //Zaman verisinin gün formatına çevrilmesi ve haftanın kaçıncı günü olduğunun belirlenmesi.
+    // _Zaman verisinin gün formatına çevrilmesi ve haftanın kaçıncı günü olduğunun belirlenmesi.
+    String _date = DateFormat('EEEE').format(_time);
     int _firstDay = 0;
     switch (_date) {
       case "Monday":
@@ -127,26 +132,88 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Appointment> appointments = <Appointment>[];
+
   _AppointmentDataSource _getCalendarDataSource() {
     var _startOfDay = DateTime(_time.year, _time.month, _time.day + 4);
-    appointments.clear();
-    appointments.add(Appointment(
-      startTime: _startOfDay,
-      endTime: _startOfDay.add(Duration(minutes: 60)),
-      subject: 'Meeting',
-      color: Colors.blue,
-      startTimeZone: '',
-      endTimeZone: '',
-    ));
 
     return _AppointmentDataSource(appointments);
+  }
+
+  void _setAppointments(CalendarTapDetails calendarTapDetails) {
+    if (calendarTapDetails.appointments == null) {
+      _ap1 = Appointment(
+        startTime: calendarTapDetails.date,
+        endTime: calendarTapDetails.date.add(Duration(minutes: 60)),
+        subject: 'Meeting',
+        color: Colors.blue,
+        startTimeZone: '',
+        endTimeZone: '',
+      );
+    } else {
+      _ap1 = Appointment(
+        startTime: calendarTapDetails.appointments[0].startTime,
+        endTime: calendarTapDetails.appointments[0].startTime
+            .add(Duration(minutes: 60)),
+        subject: 'Meeting',
+        color: Colors.blue,
+        startTimeZone: '',
+        endTimeZone: '',
+      );
+    }
+
+    setState(() {
+      var _meetingControl = appointments.singleWhere(
+          (element) => element.startTime == _ap1.startTime,
+          orElse: () => null);
+      if (_meetingControl == null) {
+        appointments.add(_ap1);
+      } else {
+        appointments.removeWhere((item) => item.startTime == _ap1.startTime);
+      }
+    });
+  }
+
+  SfCalendar _getShiftScheduler(dynamic calendarTapCallback) {
+    return SfCalendar(
+      view: CalendarView.week,
+      firstDayOfWeek: getVerboseDateTimeRepresentation(
+          _time), // _Hangi günde isek tablo başlangıcına o günün getirilmesi
+      // initialSelectedDate: DateTime(2020, 10, 18, 10), // _Açılışta gün seçili olması
+      dataSource: _getCalendarDataSource(),
+      timeSlotViewSettings: TimeSlotViewSettings(
+        timeIntervalHeight: -1,
+        dateFormat: 'd',
+        dayFormat: 'EEE', // _Gün isimlerinin formatı
+        timeInterval: Duration(minutes: 60), // _Kutular arası zaman aralığı
+        timeFormat: 'h:mm', // _Saat formatı.
+        timeTextStyle: TextStyle(
+          fontWeight: FontWeight.normal,
+          fontStyle: FontStyle.normal,
+          fontSize: 15,
+          color: Colors.black87,
+        ), // _Saat yazı stili
+      ),
+      specialRegions: _getTimeRegions(),
+      onTap: calendarTapCallback,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Flutter Calendar"),
+        title: Text("Weekly Calendar"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.calendar_today_outlined,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              // do something
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -155,42 +222,18 @@ class _HomePageState extends State<HomePage> {
             // TableCalendar(calendarController: _controller),
             Container(
               height: 820.0, // _Takvim yüksekliği
-              child: SfCalendar(
-                view: CalendarView.week,
-                firstDayOfWeek: getVerboseDateTimeRepresentation(
-                    _time), // _Hangi günde isek tablo başlangıcına o günün getirilmesi
-                // initialSelectedDate: DateTime(2020, 10, 18, 10), // _Açılışta gün seçili olması
-                dataSource: _getCalendarDataSource(),
-                timeSlotViewSettings: TimeSlotViewSettings(
-                  timeIntervalHeight: -1,
-                  dateFormat: 'd',
-                  dayFormat: 'EEE', // _Gün isimlerinin formatı
-                  timeInterval:
-                      Duration(minutes: 60), // _Kutular arası zaman aralığı
-                  timeFormat: 'h:mm', // _Saat formatı.
-                  timeTextStyle: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontStyle: FontStyle.normal,
-                    fontSize: 15,
-                    color: Colors.black87,
-                  ), // _Saat yazı stili
-                ),
-                specialRegions: _getTimeRegions(),
-              ),
+              child: _getShiftScheduler(_setAppointments),
             ),
             Center(
                 child: RaisedButton(
               onPressed: () {
                 //alertDialog(context);
-                appointments.add(Appointment(
-                  startTime: DateTime.now(),
-                  endTime: DateTime.now().add(Duration(minutes: 90)),
-                  subject: 'Meeting',
-                  color: Colors.blue,
-                  startTimeZone: '',
-                  endTimeZone: '',
-                ));
-                _AppointmentDataSource(appointments);
+                //_setAppointments();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SecondRoute(_myListView(context))),
+                );
               },
               textColor: Colors.white,
               padding: const EdgeInsets.all(0.0),
@@ -214,10 +257,82 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  Widget _myListView(BuildContext context) {
+    final DateFormat formatter = DateFormat('dd MMM y  EEEE');
+    if (appointments.length != 0) {
+      return ListView.builder(
+        itemExtent: 29.0,
+        itemCount: appointments.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text((index + 1).toString() +
+                ". " +
+                formatter.format(appointments[index].startTime).toString()),
+          );
+        },
+      );
+    } else {
+      return Text("The selection list is empty. Please choose a meeting date.",
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            height: 25,
+            color: Colors.blue[800],
+          ));
+    }
+  }
 }
 
 class _AppointmentDataSource extends CalendarDataSource {
   _AppointmentDataSource(List<Appointment> source) {
     appointments = source;
+  }
+}
+
+class SecondRoute extends StatelessWidget {
+  Widget _myListView;
+  SecondRoute(this._myListView);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("List Of Selected Items"),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 595.0,
+              child: _myListView,
+            ),
+            Center(
+                child: RaisedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(0.0),
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: <Color>[
+                      Color(0xFF0D47A1),
+                      Color(0xFF1976D2),
+                      Color(0xFF42A5F5),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.all(10.0),
+                child: const Text('Go Back', style: TextStyle(fontSize: 20)),
+              ),
+            )),
+          ],
+        ),
+      ),
+    );
   }
 }
