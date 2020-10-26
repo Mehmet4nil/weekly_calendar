@@ -28,15 +28,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  DateTime _time = DateTime.now(); //Güncel zaman veririsin alınması.
-  Appointment _ap1 = Appointment(
-    startTime: DateTime.now(),
-    endTime: DateTime.now().add(Duration(minutes: 60)),
-    subject: 'Meeting',
-    color: Colors.blue,
-    startTimeZone: '',
-    endTimeZone: '',
-  );
+  DateTime _time = DateTime.now(); // _Güncel zaman veririsin alınması.
+  // _Seçilen kutunun özelliklerinin tutulması.
+  Appointment _ap1 = Appointment();
+  // _Seçilen kutuların tüm özellikleri ile tutulduğu liste.
+  List<Appointment> appointments = <Appointment>[];
 
   int getVerboseDateTimeRepresentation(DateTime dateTime) {
     // _Zaman verisinin gün formatına çevrilmesi ve haftanın kaçıncı günü olduğunun belirlenmesi.
@@ -100,35 +96,28 @@ class _HomePageState extends State<HomePage> {
     return regions;
   }
 
-  // _Seçilen kutuların tüm özellikleri ile tutulduğu liste.
-  List<Appointment> appointments = <Appointment>[];
-
   _AppointmentDataSource _getCalendarDataSource() {
     return _AppointmentDataSource(appointments);
   }
 
   void _setAppointments(CalendarTapDetails calendarTapDetails) {
+    _ap1 = Appointment(
+      startTime: null,
+      endTime: null,
+      subject: 'Meeting',
+      color: Colors.cyanAccent[600],
+      startTimeZone: '',
+      endTimeZone: '',
+    );
     if (calendarTapDetails.appointments == null) {
       // _Boş kutuya tıklandığında eklenecek toplantının verilerini tutar.
-      _ap1 = Appointment(
-        startTime: calendarTapDetails.date,
-        endTime: calendarTapDetails.date.add(Duration(minutes: 60)),
-        subject: 'Meeting',
-        color: Colors.cyanAccent[600],
-        startTimeZone: '',
-        endTimeZone: '',
-      );
+      _ap1.startTime = calendarTapDetails.date;
+      _ap1.endTime = calendarTapDetails.date.add(Duration(minutes: 60));
     } else {
       // _Silinecek veri seçildiğinde dönen veri, ikinci seçmede özellik farklı döndüğü için bu çözüm kullanıldı.
-      _ap1 = Appointment(
-        startTime: calendarTapDetails.appointments[0].startTime,
-        endTime: calendarTapDetails.appointments[0].startTime
-            .add(Duration(minutes: 60)),
-        subject: '',
-        color: Colors.blue,
-        startTimeZone: '',
-        endTimeZone: '',
-      );
+      _ap1.startTime = calendarTapDetails.appointments[0].startTime;
+      _ap1.endTime = calendarTapDetails.appointments[0].startTime
+          .add(Duration(minutes: 60));
     }
 
     setState(() {
